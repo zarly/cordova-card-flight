@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        id="cordova-plugin-cardflight" version="0.0.1">
+    <name>CardFlight</name>
+    <description>Cordova CardFlight Plugin</description>
+    <author>Jack Ratner (Bandwagon)</author>
+    <license>Apache 2.0</license>
+    <keywords>cordova,payment,cardflight,stripe,pos</keywords>
+    <js-module src="www/cardFlight.js" name="cardFlight">
+        <clobbers target="cordova.plugins.cardFlight" />
+    </js-module>
+    <platform name="ios">
+        <config-file target="config.xml" parent="/*">
+            <feature name="CDVCardFlight">
+                <param name="ios-package" value="CDVCardFlight"/>
+            </feature>
+        </config-file>
+        <header-file src="src/ios/CDVCardFlight.h" />
+        <header-file src="src/ios/CFTReader.h" />
+        <header-file src="src/ios/CFTCard.h" />
+        <header-file src="src/ios/CFTSessionManager.h" />
+        <header-file src="src/ios/CFTEnum.h" />
+        <header-file src="src/ios/CFTBaseReader.h" />
+        <header-file src="src/ios/CFTCharge.h" />
+        <header-file src="src/ios/CFTAPIResource.h" />
+        <source-file src="src/ios/CDVCardFlight.m" />
+        <framework src="AVFoundation.framework" />
+        <framework src="AudioToolbox.framework" />
+        <framework src="MediaPlayer.framework" />
+        <framework src="MessageUI.framework" />
+        <framework src="CoreGraphics.framework" />
+        <framework src="libstdc++.6.0.9.dylib" />
+        <framework src="ExternalAccessory.framework" />
+        <source-file src="src/ios/libCardFlightLibrary.a" framework="true" />
+    </platform>
+</plugin>
