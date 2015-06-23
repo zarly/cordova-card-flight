@@ -20,35 +20,30 @@
 }
 
 - (void)readerIsAttached {
-  NSLog(@"Reader attached callback");
   if (self.readerAttachedCallbackID) {
     [self sendSuccessMessage:@"Reader is attached" withCallbackID:self.readerAttachedCallbackID];
   }
 }
 
 - (void)readerIsConnecting {
-  NSLog(@"Reader is connecting callback");
   if (self.readerConnectingCallbackID) {
     [self sendSuccessMessage:@"Reader is connecting" withCallbackID:self.readerConnectingCallbackID];
   }
 }
 
 - (void)readerSwipeDetected {
-  NSLog(@"Swipe detected callback");
   if (self.readerSwipeCallbackID) {
     [self sendSuccessMessage:@"Swipe detected" withCallbackID:self.readerSwipeCallbackID];
   }
 }
 
 - (void)readerBatteryLow {
-  NSLog(@"Battery low callback");
   if (self.readerBatteryLowCallbackID) {
     [self sendSuccessMessage:@"Reader battery is low" withCallbackID:self.readerBatteryLowCallbackID];
   }
 }
 
 - (void)readerNotDetected {
-  NSLog(@"Reader not detected callback");
   if (self.readerUndetectedCallbackID) {
     [self sendSuccessMessage:@"Reader not detected" withCallbackID:self.readerUndetectedCallbackID];
   }
@@ -60,13 +55,10 @@
   }
   
   if (error) {
-    NSLog(@"Reader is connected callback with error: %@", error);
     [self sendErrorMessage:[error localizedDescription] withCallbackID:self.readerConnectedCallbackID];
   } else if (isConnected) {
-    NSLog(@"Reader is connected callback, connected");
     [self sendSuccessMessage:@"Reader connected" withCallbackID:self.readerConnectedCallbackID];
   } else {
-    NSLog(@"Reader is connected callback but not connected");
     [self sendErrorMessage:@"Reader is not connected, no error given" withCallbackID:self.readerConnectedCallbackID];
   }
 }
@@ -81,7 +73,6 @@
 
 
 - (void)readerIsDisconnected {
-  NSLog(@"Reader disconnected callback");
   if (self.readerDetatchedCallbackID) {
     [self sendSuccessMessage:@"Reader disconnected" withCallbackID:self.readerDetatchedCallbackID];
   }
@@ -159,25 +150,35 @@
 
 - (void)readerCardResponse:(CFTCard *)card withError:(NSError *)error {
   if (error) {
-    NSLog(@"Card reader read callback error: %@", error);
     [self sendErrorMessage:[error localizedDescription] withCallbackID:self.cardReadCallbackID];
   } else {
-    NSLog(@"Card reader read callback success");
     _card = card;
-
-    // the following code causes a fatal lookup error:
-    // NSDictionary* dict = @{
-    //   @"cardName": card.name,
-    //   @"cardNumber": card.encryptedSwipedCardNumber,
-    //   @"cardExpirationMonth": card.expirationMonth,
-    //   @"cardExpirationYear": card.expirationYear,
-    //   @"message": @"Card read successfully"
-    // };
-    // [self sendSuccessDictionary:dict withCallbackID:self.cardReadCallbackID];
-    // dict = nil;
-
-    // the following does not:
     [self sendSuccessMessage:@"Card read successfully" withCallbackID:self.cardReadCallbackID];
+
+    // NSDictionary* dict = @{
+    //   @"message": @"Card read successfully",
+    //   @"cardName": [[NSString alloc] initWithString:card.name],
+    //   @"cardNumber": [[NSString alloc] initWithString:card.encryptedSwipedCardNumber],
+    //   @"cardExpirationMonth": [[NSString alloc] initWithString:card.expirationMonth],
+    //   @"cardExpirationYear": [[NSString alloc] initWithString:card.expirationYear]
+    // };
+
+    // NSError *error; 
+    // NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict 
+    //                                         options:0
+    //                                         error:&error];
+
+    // if (!jsonData) {
+    //   if (error) {
+    //     [self sendErrorMessage:[error localizedDescription] withCallbackID:cardReadCallbackID];
+    //   } else {
+    //     [self sendErrorMessage:@"No json data found" withCallbackID:cardReadCallbackID];
+    //   }
+    // } else {
+    //   NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+    //   NSLog(@"Returning json: %@", jsonString);
+    //   [self sendSuccessMessage:jsonString withCallbackID:self.cardReadCallbackID];
+    // }
   }
 }
 
@@ -185,37 +186,41 @@
   NSString* tokenizeCallbackID = [command callbackId];
 
   if (!_card) {
-    NSLog(@"No card read to tokenize");
     return [self sendErrorMessage:@"No card to tokenize" withCallbackID:tokenizeCallbackID];
   }
 
   [_card tokenizeCardWithSuccess:^{
-      NSLog(@"tokenize card success callback");
-      NSDictionary* dict = @{
-        @"message": @"Card tokenized with Stripe successfully",
-        @"cardName": _card.name,
-        @"cardNumber": _card.encryptedSwipedCardNumber,
-        @"cardExpirationMonth": _card.expirationMonth,
-        @"cardExpirationYear": _card.expirationYear,
-        @"token": _card.cardToken
-      };
-      [self sendSuccessDictionary:dict withCallbackID:tokenizeCallbackID];
-      dict = nil;
+      // NSDictionary* dict = @{
+      //   @"message": @"Card tokenized with Stripe successfully",
+      //   @"cardName": [[NSString alloc] initWithString:_card.name],
+      //   @"cardNumber": [[NSString alloc] initWithString:_card.encryptedSwipedCardNumber],
+      //   @"cardExpirationMonth": [[NSString alloc] initWithString:_card.expirationMonth],
+      //   @"cardExpirationYear": [[NSString alloc] initWithString:_card.expirationYear],
+      //   @"token": [[NSString alloc] initWithString: _card.cardToken]
+      //   // @"cardName": _card.name,
+      //   // @"cardNumber": _card.encryptedSwipedCardNumber,
+      //   // @"cardExpirationMonth": _card.expirationMonth,
+      //   // @"cardExpirationYear": _card.expirationYear,
+      //   // @"token": _card.cardToken
+      // };
+      // [self sendSuccessDictionary:dict withCallbackID:tokenizeCallbackID];
+      [self sendSuccessMessage:_card.cardToken withCallbackID:tokenizeCallbackID];
     }
     failure:^(NSError *error){
-      NSLog(@"tokenize card error callback");
       [self sendErrorMessage:[error localizedDescription] withCallbackID:tokenizeCallbackID];
     }];
 }
 
 - (void)sendSuccessDictionary:(NSDictionary *)responseBody {
-  CDVPluginResult* successResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:responseBody];
-  [self.commandDelegate sendPluginResult:successResult callbackId:self.currentCallbackID];
+  CDVPluginResult* goingToCauseError = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:responseBody];
+  CDVPluginResult* safe = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:[goingToCauseError argumentsAsJSON]];
+  [self.commandDelegate sendPluginResult:safe callbackId:self.currentCallbackID];
 }
 
 - (void)sendSuccessDictionary:(NSDictionary *)responseBody withCallbackID:(NSString *)callbackID {
-  CDVPluginResult* successResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:responseBody];
-  [self.commandDelegate sendPluginResult:successResult callbackId:callbackID];
+  CDVPluginResult* goingToCauseError = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:responseBody];
+  CDVPluginResult* safe = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:[goingToCauseError argumentsAsJSON]];
+  [self.commandDelegate sendPluginResult:safe callbackId:callbackID];
 }
 
 - (void)sendSuccessMessage:(NSString *)responseString {
