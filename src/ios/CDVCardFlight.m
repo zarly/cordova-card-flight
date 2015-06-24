@@ -143,7 +143,8 @@
 
 - (void)watchForSwipe:(CDVInvokedUrlCommand*)command {
   [self setCurrentCallbackID:[command callbackId]];
-
+  _card = nil;
+  
   [_reader beginSwipe];
   [self sendSuccessMessage:@"CardFlight reader awaiting swipe"];
 }
