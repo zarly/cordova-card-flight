@@ -1,19 +1,25 @@
-package org.weeels.cardFlight;
+package org.weeels.plugins.cardflight;
 
+import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CallbackContext;
-import cardflight.CardFlightDeviceHandler;
-import cardflight.CardFlightTokenizationHandler;
+import com.getcardflight.models.Card;
+import com.getcardflight.interfaces.*;
 import android.util.Log;
 
 public class CardFlightHandler implements CardFlightDeviceHandler {
   
   private Card card;
+  private CordovaInterface cordova;
 
   private CallbackContext cardReadCallbackContext;
   private CallbackContext readerAttachedCallbackContext;
   private CallbackContext readerConnectingCallbackContext;
   private CallbackContext readerDisconnectedCallbackContext;
   private CallbackContext readerConnectedCallbackContext;
+
+  public CardFlightHandler(CordovaInterface c) {
+    cordova = c;
+  }
 
   public void onCardRead(CallbackContext callbackContext) {
     log("Setting onCardRead callback");
@@ -52,35 +58,22 @@ public class CardFlightHandler implements CardFlightDeviceHandler {
 
   public void tokenizeCard(CallbackContext callbackContext) {
     log("tokenizing card");
-    if (!card) {
+    if (card == null) {
       callbackContext.error("No card to tokenize");
     }
 
-    card.tokenize(new CardFlightTokenizationHandler() {
-      @Override
-      public void tokenizationSuccessful(String result){
-        log("tokenization success callback");
-        if (!card.token) {
-          callbackContext.error("Got tokenization success callback but token was null");
-        } else {
-          callbackContext.success(card.token);
-        }
-      }
+    TokenizationHandler tokenHandler = new TokenizationHandler(card, callbackContext);
+    card.tokenize(tokenHandler, cordova.getActivity().getApplicationContext());
+  }
 
-      @Override
-      public void tokenizationFailed(String error, int errorCode) {
-        log("tokenization fail callback");
-        logError(error);
-        callbackContext.error(error);
-      },
-    },
-    getApplicationContext());
+  public void resetCard() {
+    card = null;
   }
 
   @Override
   public void readerCardResponse(Card c) {
     log("readerCardResponse called");
-    if (cardReadCallbackContext) {
+    if (cardReadCallbackContext != null) {
       card = c;
       cardReadCallbackContext.success("Card read successfully");
     }
@@ -89,7 +82,7 @@ public class CardFlightHandler implements CardFlightDeviceHandler {
   @Override
   public void readerIsConnecting() {
     log("readerIsConnecting called");
-    if (readerConnectingCallbackContext) {
+    if (readerConnectingCallbackContext != null) {
       readerConnectingCallbackContext.success("Reader is connecting");
     }
   }
@@ -97,11 +90,11 @@ public class CardFlightHandler implements CardFlightDeviceHandler {
   @Override
   public void readerIsAttached() {
     log("readerIsAttached called");
-    if (readerAttachedCallbackContext) {
+    if (readerAttachedCallbackContext != null) {
       readerAttachedCallbackContext.success("Reader attached");
     }
 
-    if (readerConnectedCallbackContext) {
+    if (readerConnectedCallbackContext != null) {
       readerConnectedCallbackContext.success("Reader attached");
     }
   }
@@ -109,7 +102,7 @@ public class CardFlightHandler implements CardFlightDeviceHandler {
   @Override
   public void readerIsDisconnected() {
     log("readerIsDisconnected called");
-    if (readerDisconnectedCallbackContext) {
+    if (readerDisconnectedCallbackContext != null) {
       readerDisconnectedCallbackContext.success("Reader disconnected");
     }
   }

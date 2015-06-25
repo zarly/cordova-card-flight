@@ -38,7 +38,7 @@
     <platform name="android">
         <config-file target="config.xml" parent="/*">
             <feature name="CDVCardFlight">
-                <param name="android-package" value="org.weeels.CDVCardFlight" />
+                <param name="android-package" value="org.weeels.plugins.cardflight.CDVCardFlight" />
             </feature>
         </config-file>
 
@@ -50,11 +50,11 @@
             <uses-permission android:name="android.permission.INTERNET" />
         </config-file>
 
-        <framework src="build.gradle" custom="true" type="gradleReference" />
-        
-        <!-- <lib-file src="src/android/libs/cardflight.jar" /> -->
-        <src-file src="src/android/libs/cardflight.jar" target-dir="libs" />
-        <source-file src="src/android/CDVCardFlight.java" target-dir="src/android/org/weeels/cardFlight" />
-        <source-file src="src/android/CardFlightHandler.java" target-dir="src/android/org/weeels/cardFlight" />
+        <!-- <framework src="src/android/build.gradle" custom="true" type="gradleReference" /> -->
+        <lib-file src="src/android/libs/cardflight.jar" />
+        <!-- <src-file src="src/android/libs/cardflight.jar" target-dir="libs" /> -->
+        <source-file src="src/android/CDVCardFlight.java" target-dir="src/org/weeels/plugins/cardFlight" />
+        <source-file src="src/android/CardFlightHandler.java" target-dir="src/org/weeels/plugins/cardFlight" />
+        <source-file src="src/android/TokenizationHandler.java" target-dir="src/org/weeels/plugins/cardFlight" />
     </platform>
 </plugin>

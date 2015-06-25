@@ -1,4 +1,4 @@
-package org.weeels.cardFlight;
+package org.weeels.plugins.cardflight;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
@@ -7,10 +7,9 @@ import org.apache.cordova.CordovaWebView;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import cardflight.Reader;
 
-import cardflight.CardFlight;
-import cardflight.Reader;
+import com.getcardflight.models.CardFlight;
+import com.getcardflight.models.Reader;
 
 import android.util.Log;
 
@@ -22,60 +21,44 @@ public class CDVCardFlight extends CordovaPlugin {
   @Override
   public void initialize(CordovaInterface cordova, CordovaWebView webView) {
     super.initialize(cordova, webView);
-    handler = new CardFlightHandler();
+    handler = new CardFlightHandler(cordova);
   }
 
   @Override
   public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-    boolean success = true
+    boolean success = true;
 
-    switch (action) {
-      case "authorizeCardFlightAccount":
-        this.authorizeCardFlightAccount(args, callbackContext);
-        break;
-      case "initializeReader":
-        this.initializeReader(callbackContext);
-        break;
-      case "onReaderAttached":
-        handler.onReaderConnected(callbackContext);
-        break;
-      case "onReaderConnecting":
-        handler.onReaderConnecting(callbackContext);
-        break;
-      case "onSwipeDetected":
-        handler.onSwipeDetected(callbackContext);
-        break;
-      case "onBatteryLow":
-        handler.onBatteryLow(callbackContext);
-        break;
-      case "onReaderDisconnected":
-        handler.onReaderDisconnected(callbackContext);
-        break;
-      case "tokenizeLastSwipe":
-        handler.tokenizeCard(callbackContext);
-        break;
-      case "onReaderConnected":
-        handler.onReaderConnected(callbackContext);
-        break;
-      case "watchForSwipe":
-        this.watchForSwipe(callbackContext);
-        break;
-      case "onCardRead":
-        handler.onCardRead(callbackContext);
-        break;
-      default:
-        success = false
-        break;
+    if (action.equals("authorizeCardFlightAccount")) {
+      this.authorizeCardFlightAccount(args.getString(0), args.getString(1), callbackContext);
+    } else if (action.equals("initializeReader")) {
+      this.initializeReader(callbackContext);
+    } else if (action.equals("onReaderAttached")) {
+      handler.onReaderConnected(callbackContext);
+    } else if (action.equals("onReaderConnecting")) {
+      handler.onReaderConnecting(callbackContext);
+    } else if (action.equals("onSwipeDetected")) {
+      handler.onSwipeDetected(callbackContext);
+    } else if (action.equals("onBatteryLow")) {
+      handler.onBatteryLow(callbackContext);
+    } else if (action.equals("onReaderDisconnected")) {
+      handler.onReaderDisconnected(callbackContext);
+    } else if (action.equals("tokenizeLastSwipe")) {
+      handler.tokenizeCard(callbackContext);
+    } else if (action.equals("onReaderConnected")) {
+      handler.onReaderConnected(callbackContext);
+    } else if (action.equals("watchForSwipe")) {
+      this.watchForSwipe(callbackContext);
+    } else if (action.equals("onCardRead")) {
+      handler.onCardRead(callbackContext);
+    } else {
+      success = false;
     }
     
     return success;
   }
 
-  private void authorizeCardFlightAccount(JSONArray args, CallbackContext callbackContext) {
-    String apiToken = args.getString(0);
-    String stripeMerchantToken = args.getString(1);
-
-    if (!apiToken || !stripeMerchantToken) {
+  private void authorizeCardFlightAccount(String apiToken, String stripeMerchantToken, CallbackContext callbackContext) {
+    if (apiToken == null || stripeMerchantToken == null) {
       callbackContext.error("Need to send both an api token and a stripe merchant token to authorize cardflight");
     }
 
@@ -83,11 +66,12 @@ public class CDVCardFlight extends CordovaPlugin {
   }
 
   private void initializeReader(CallbackContext callbackContext) {
-    reader = new Reader(getApplicationContext(), handler);
+    reader = new Reader(this.cordova.getActivity().getApplicationContext(), handler);
     callbackContext.success("CardFlight reader initialized");
   }
 
   private void watchForSwipe(CallbackContext callbackContext) {
+    handler.resetCard();
     reader.beginSwipe();
     callbackContext.success("CardFlight reader awaiting swipe");
   }
