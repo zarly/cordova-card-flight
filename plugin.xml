@@ -9,6 +9,7 @@
     <js-module src="www/cardFlight.js" name="cardFlight">
         <clobbers target="cordova.plugins.cardFlight" />
     </js-module>
+   
     <platform name="ios">
         <config-file target="config.xml" parent="/*">
             <feature name="CDVCardFlight">
@@ -32,5 +33,28 @@
         <framework src="libstdc++.6.0.9.dylib" />
         <framework src="ExternalAccessory.framework" />
         <source-file src="src/ios/libCardFlightLibrary.a" framework="true" />
+    </platform>
+
+    <platform name="android">
+        <config-file target="config.xml" parent="/*">
+            <feature name="CDVCardFlight">
+                <param name="android-package" value="org.weeels.CDVCardFlight" />
+            </feature>
+        </config-file>
+
+        <config-file target="AndroidManifest.xml" parent="application">
+            <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+            <uses-permission android:name="android.permission.RECORD_AUDIO" />
+            <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
+            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+            <uses-permission android:name="android.permission.INTERNET" />
+        </config-file>
+
+        <framework src="build.gradle" custom="true" type="gradleReference" />
+        
+        <!-- <lib-file src="src/android/libs/cardflight.jar" /> -->
+        <src-file src="src/android/libs/cardflight.jar" target-dir="libs" />
+        <source-file src="src/android/CDVCardFlight.java" target-dir="src/android/org/weeels/cardFlight" />
+        <source-file src="src/android/CardFlightHandler.java" target-dir="src/android/org/weeels/cardFlight" />
     </platform>
 </plugin>
