@@ -18,11 +18,12 @@ public class TokenizationHandler implements CardFlightTokenizationHandler {
 
   @Override
   public void tokenizationSuccessful(String result){
-    log("tokenization success callback");
     // if (card.token == null) {
     if (result == null) {
+      log("card tokenization no token result");
       tokenizeCallbackContext.error("Got tokenization success callback but token was null");
     } else {
+      log("card tokenization success");
       // tokenizeCallbackContext.success(card.token);
       tokenizeCallbackContext.success(result);
     }
@@ -35,10 +36,10 @@ public class TokenizationHandler implements CardFlightTokenizationHandler {
   }
 
   private void log(String s) {
-    Log.i("CardFlightHandler", s);
+    Log.i("CDVCardFlightTokenizationHandler", s);
   }
 
   private void logError(String s) {
-    Log.e("CardFlightHandler", s);
+    Log.e("CDVCardFlightTokenizationHandler", s);
   }
 }

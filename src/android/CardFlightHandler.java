@@ -118,10 +118,10 @@ public class CardFlightHandler implements CardFlightDeviceHandler {
   }
 
   private void log(String s) {
-    Log.i("CardFlightHandler", s);
+    Log.i("CDVCardFlightDeviceHandler", s);
   }
 
   private void logError(String s) {
-    Log.e("CardFlightHandler", s);
+    Log.e("CDVCardFlightDeviceHandler", s);
   }
 }

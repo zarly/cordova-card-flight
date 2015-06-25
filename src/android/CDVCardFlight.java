@@ -28,6 +28,8 @@ public class CDVCardFlight extends CordovaPlugin {
   public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
     boolean success = true;
 
+    log("In cordova execute");
+
     if (action.equals("authorizeCardFlightAccount")) {
       this.authorizeCardFlightAccount(args.getString(0), args.getString(1), callbackContext);
     } else if (action.equals("initializeReader")) {
@@ -59,20 +61,33 @@ public class CDVCardFlight extends CordovaPlugin {
 
   private void authorizeCardFlightAccount(String apiToken, String stripeMerchantToken, CallbackContext callbackContext) {
     if (apiToken == null || stripeMerchantToken == null) {
+      logError("Need to send both an api token and a stripe merchant token to authorize cardflight");
       callbackContext.error("Need to send both an api token and a stripe merchant token to authorize cardflight");
     }
 
     CardFlight.getInstance().setApiTokenAndAccountToken(apiToken, stripeMerchantToken);
+    log("CardFlight authorized on this device");
+    callbackContext.success("CardFlight authorized on this device");
   }
 
   private void initializeReader(CallbackContext callbackContext) {
-    reader = new Reader(this.cordova.getActivity().getApplicationContext(), handler);
-    callbackContext.success("CardFlight reader initialized");
+    log("CardFlight reader initializing");
+    reader = new Reader(this.cordova.getActivity().getApplicationContext(), handler, new AutoConfigHandler(callbackContext));
+    // callbackContext.success("CardFlight reader initialized");
   }
 
   private void watchForSwipe(CallbackContext callbackContext) {
     handler.resetCard();
     reader.beginSwipe();
+    log("CardFlight reader awaiting swipe");
     callbackContext.success("CardFlight reader awaiting swipe");
+  }
+
+  private void log(String s) {
+    Log.i("CDVCardFlight", s);
+  }
+
+  private void logError(String s) {
+    Log.e("CDVCardFlight", s);
   }
 }
