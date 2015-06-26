@@ -17,11 +17,13 @@ public class CDVCardFlight extends CordovaPlugin {
 
   private Reader reader;
   private CardFlightHandler handler;
+  private CordovaInterface cdv;
 
   @Override
   public void initialize(CordovaInterface cordova, CordovaWebView webView) {
     super.initialize(cordova, webView);
     handler = new CardFlightHandler(cordova);
+    cdv = cordova;
   }
 
   @Override
@@ -70,10 +72,19 @@ public class CDVCardFlight extends CordovaPlugin {
     callbackContext.success("CardFlight authorized on this device");
   }
 
-  private void initializeReader(CallbackContext callbackContext) {
+  private void initializeReader(final CallbackContext callbackContext) {
     log("CardFlight reader initializing");
-    reader = new Reader(this.cordova.getActivity().getApplicationContext(), handler, new AutoConfigHandler(callbackContext));
-    // callbackContext.success("CardFlight reader initialized");
+    // cdv.getThreadPool().execute(new Runnable() {
+    //   public void run() {
+    //     reader = new Reader(cdv.getActivity().getApplicationContext(), handler);
+    //     callbackContext.success("CardFlight reader initialized");
+    //     // reader = new Reader(this.cordova.getActivity().getApplicationContext(), handler, new AutoConfigHandler(callbackContext));
+    //     // log("Reader AutoConfigHandler has cordova callback");
+    //   }
+    // });
+
+    reader = new Reader(cdv.getActivity().getApplicationContext(), handler);
+    callbackContext.success("CardFlight reader initialized");
   }
 
   private void watchForSwipe(CallbackContext callbackContext) {

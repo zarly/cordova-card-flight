@@ -17,6 +17,8 @@ public class CardFlightHandler implements CardFlightDeviceHandler {
   private CallbackContext readerDisconnectedCallbackContext;
   private CallbackContext readerConnectedCallbackContext;
 
+  private boolean conntectedAfterConnectingCalled;
+
   public CardFlightHandler(CordovaInterface c) {
     cordova = c;
   }
@@ -85,6 +87,26 @@ public class CardFlightHandler implements CardFlightDeviceHandler {
     if (readerConnectingCallbackContext != null) {
       readerConnectingCallbackContext.success("Reader is connecting");
     }
+
+    readerIsAttached();
+
+    // conntectedAfterConnectingCalled = false;
+    // cordova.getThreadPool().execute(new Runnable() {
+    //   public void run() {
+    //     log("Triggering connected from connecting");
+    //     if (conntectedAfterConnectingCalled) {
+    //       log("Connected called successfully so not mocking it");
+    //     } else {
+    //       if (readerAttachedCallbackContext != null) {
+    //         readerAttachedCallbackContext.success("Reader attached");
+    //       }
+
+    //       if (readerConnectedCallbackContext != null) {
+    //         readerConnectedCallbackContext.success("Reader attached");
+    //       }
+    //     }
+    //   }
+    // });
   }
 
   @Override

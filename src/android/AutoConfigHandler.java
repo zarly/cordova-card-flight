@@ -12,18 +12,21 @@ public class AutoConfigHandler implements CardFlightAutoConfigHandler {
     callbackContext = ctx;
   }
 
+  @Override
   public void autoConfigProgressUpdate(int progress) {
     log("AutoConfig percent complete: "+progress+"%");
   }
 
+  @Override
   public void autoConfigFinished() {
     log("AutoConfig successful");
-    callbackContext.success("Initialization success")
+    callbackContext.success("Initialization success");
   }
 
+  @Override
   public void autoConfigFailed() {
     logError("AutoConfig failed");
-    callbackContext.error("Initialization failed: AutoConfig failed")
+    callbackContext.error("Initialization failed: AutoConfig failed");
   }
 
   private void log(String s) {
