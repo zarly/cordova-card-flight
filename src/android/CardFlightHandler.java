@@ -2,6 +2,7 @@ package org.weeels.plugins.cardflight;
 
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CallbackContext;
+import org.apache.cordova.PluginResult;
 import com.getcardflight.models.Card;
 import com.getcardflight.interfaces.*;
 import android.util.Log;
@@ -16,11 +17,24 @@ public class CardFlightHandler implements CardFlightDeviceHandler {
   private CallbackContext readerConnectingCallbackContext;
   private CallbackContext readerDisconnectedCallbackContext;
   private CallbackContext readerConnectedCallbackContext;
+  private CallbackContext onBeginSwipeCallbackContext;
 
   private boolean conntectedAfterConnectingCalled;
 
   public CardFlightHandler(CordovaInterface c) {
     cordova = c;
+  }
+
+  private void sendSuccessToCallback(CallbackContext callbackContext, String message) {
+    PluginResult result = new PluginResult(PluginResult.Status.OK, message);
+    result.setKeepCallback(true);
+    callbackContext.sendPluginResult(result);
+  }
+
+  private void sendErrorToCallback(CallbackContext callbackContext, String message) {
+    PluginResult result = new PluginResult(PluginResult.Status.ERROR, message);
+    result.setKeepCallback(true);
+    callbackContext.sendPluginResult(result);
   }
 
   public void onCardRead(CallbackContext callbackContext) {
@@ -49,8 +63,8 @@ public class CardFlightHandler implements CardFlightDeviceHandler {
   }
 
   public void onSwipeDetected(CallbackContext callbackContext) {
-    logError("onSwipeDetected not supported by Android CardFlight SDK");
-    callbackContext.error("Cannot use onSwipeDetected on Android");
+    log("Setting onSwipeDetected callback");
+    onBeginSwipeCallbackContext = callbackContext;
   }
 
   public void onBatteryLow(CallbackContext callbackContext) {
@@ -77,7 +91,8 @@ public class CardFlightHandler implements CardFlightDeviceHandler {
     log("readerCardResponse called");
     if (cardReadCallbackContext != null) {
       card = c;
-      cardReadCallbackContext.success("Card read successfully");
+      sendSuccessToCallback(cardReadCallbackContext, "Card read successfully");
+      // cardReadCallbackContext.success("Card read successfully");
     }
   }
 
@@ -85,7 +100,8 @@ public class CardFlightHandler implements CardFlightDeviceHandler {
   public void readerIsConnecting() {
     log("readerIsConnecting called");
     if (readerConnectingCallbackContext != null) {
-      readerConnectingCallbackContext.success("Reader is connecting");
+      sendSuccessToCallback(readerConnectingCallbackContext, "Reader is connecting");
+      // readerConnectingCallbackContext.success("Reader is connecting");
     }
 
     readerIsAttached();
@@ -113,11 +129,13 @@ public class CardFlightHandler implements CardFlightDeviceHandler {
   public void readerIsAttached() {
     log("readerIsAttached called");
     if (readerAttachedCallbackContext != null) {
-      readerAttachedCallbackContext.success("Reader attached");
+      sendSuccessToCallback(readerAttachedCallbackContext, "Reader attached");
+      // readerAttachedCallbackContext.success("Reader attached");
     }
 
     if (readerConnectedCallbackContext != null) {
-      readerConnectedCallbackContext.success("Reader attached");
+      sendSuccessToCallback(readerConnectedCallbackContext, "Reader attached");
+      // readerConnectedCallbackContext.success("Reader attached");
     }
   }
 
@@ -125,18 +143,22 @@ public class CardFlightHandler implements CardFlightDeviceHandler {
   public void readerIsDisconnected() {
     log("readerIsDisconnected called");
     if (readerDisconnectedCallbackContext != null) {
-      readerDisconnectedCallbackContext.success("Reader disconnected");
+      sendSuccessToCallback(readerDisconnectedCallbackContext, "Reader disconnected");
+      // readerDisconnectedCallbackContext.success("Reader disconnected");
     }
   }
 
   @Override
   public void deviceBeginSwipe() {
     log("deviceBeginSwipe called");
+    if (onBeginSwipeCallbackContext != null) {
+      sendSuccessToCallback(onBeginSwipeCallbackContext, "Reader swipe begin");
+    }
   }
 
   @Override
   public void readerFail(String errorMessage, int errorCode) {
-    logError(errorMessage);
+    logError("readerFail callback: " + errorMessage);
   }
 
   private void log(String s) {
