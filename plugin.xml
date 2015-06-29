@@ -42,7 +42,7 @@
             </feature>
         </config-file>
 
-        <config-file target="AndroidManifest.xml" parent="application">
+        <config-file target="AndroidManifest.xml" parent="/*">
             <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
             <uses-permission android:name="android.permission.RECORD_AUDIO" />
             <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
@@ -50,9 +50,7 @@
             <uses-permission android:name="android.permission.INTERNET" />
         </config-file>
 
-        <!-- <framework src="src/android/build.gradle" custom="true" type="gradleReference" /> -->
         <lib-file src="src/android/libs/cardflight.jar" />
-        <!-- <src-file src="src/android/libs/cardflight.jar" target-dir="libs" /> -->
         <source-file src="src/android/CDVCardFlight.java" target-dir="src/org/weeels/plugins/cardFlight" />
         <source-file src="src/android/CardFlightHandler.java" target-dir="src/org/weeels/plugins/cardFlight" />
         <source-file src="src/android/TokenizationHandler.java" target-dir="src/org/weeels/plugins/cardFlight" />
