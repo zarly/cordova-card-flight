@@ -104,8 +104,6 @@ public class CardFlightHandler implements CardFlightDeviceHandler {
       // readerConnectingCallbackContext.success("Reader is connecting");
     }
 
-    readerIsAttached();
-
     // conntectedAfterConnectingCalled = false;
     // cordova.getThreadPool().execute(new Runnable() {
     //   public void run() {
@@ -159,6 +157,9 @@ public class CardFlightHandler implements CardFlightDeviceHandler {
   @Override
   public void readerFail(String errorMessage, int errorCode) {
     logError("readerFail callback: " + errorMessage);
+    if (readerConnectingCallbackContext != null) {
+      sendErrorToCallback(readerConnectingCallbackContext, "Error connecting: "+errorMessage);
+    }
   }
 
   private void log(String s) {

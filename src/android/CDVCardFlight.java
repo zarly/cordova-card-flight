@@ -30,8 +30,6 @@ public class CDVCardFlight extends CordovaPlugin {
   public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
     boolean success = true;
 
-    log("In cordova execute");
-
     if (action.equals("authorizeCardFlightAccount")) {
       this.authorizeCardFlightAccount(args.getString(0), args.getString(1), callbackContext);
     } else if (action.equals("initializeReader")) {
