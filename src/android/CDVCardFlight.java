@@ -1,17 +1,14 @@
 package org.weeels.plugins.cardflight;
 
+import android.util.Log;
+import com.getcardflight.models.CardFlight;
+import com.getcardflight.models.Reader;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.getcardflight.models.CardFlight;
-import com.getcardflight.models.Reader;
-
-import android.util.Log;
 
 public class CDVCardFlight extends CordovaPlugin {
 
@@ -52,6 +49,12 @@ public class CDVCardFlight extends CordovaPlugin {
       this.watchForSwipe(callbackContext);
     } else if (action.equals("onCardRead")) {
       handler.onCardRead(callbackContext);
+    } else if (action.equals("startOnReaderAttached")) {
+      handler.onReaderAttached(callbackContext);
+    } else if (action.equals("onReaderFail")){
+      handler.onReaderFail(callbackContext);
+    } else if (action.equals("stopSwipe")) {
+      reader.StopSwipe();
     } else {
       success = false;
     }
@@ -82,6 +85,7 @@ public class CDVCardFlight extends CordovaPlugin {
     // });
 
     reader = new Reader(cdv.getActivity().getApplicationContext(), handler);
+    this.handler.setReader(reader);
     callbackContext.success("CardFlight reader initialized");
   }
 

@@ -51,9 +51,9 @@
         </config-file>
 
         <lib-file src="src/android/libs/cardflight.jar" />
-        <source-file src="src/android/CDVCardFlight.java" target-dir="src/org/weeels/plugins/cardFlight" />
-        <source-file src="src/android/CardFlightHandler.java" target-dir="src/org/weeels/plugins/cardFlight" />
-        <source-file src="src/android/TokenizationHandler.java" target-dir="src/org/weeels/plugins/cardFlight" />
-        <source-file src="src/android/AutoConfigHandler.java" target-dir="src/org/weeels/plugins/cardFlight" />
+        <source-file src="src/android/CDVCardFlight.java" target-dir="src/org/weeels/plugins/cardflight" />
+        <source-file src="src/android/CardFlightHandler.java" target-dir="src/org/weeels/plugins/cardflight" />
+        <source-file src="src/android/TokenizationHandler.java" target-dir="src/org/weeels/plugins/cardflight" />
+        <source-file src="src/android/AutoConfigHandler.java" target-dir="src/org/weeels/plugins/cardflight" />
     </platform>
 </plugin>

@@ -1,4 +1,4 @@
-var exec = require('cordova/exec'),
+cordova.define("cordova-plugin-cardflight.cardFlight", function(require, exports, module) { var exec = require('cordova/exec'),
     cardFlight,
     CardFlight = function(){}
 
@@ -28,6 +28,10 @@ CardFlight.prototype.onReaderConnecting = function(cb){
 CardFlight.prototype.onSwipeDetected = function(cb){
   cordova.exec(cb, cb, 'CDVCardFlight', 'onSwipeDetected', [])
 }
+
+CardFlight.prototype.onReaderFail = function(cb){
+    cordova.exec(cb, cb, 'CDVCardFlight', 'onReaderFail', [])
+  }
 
 CardFlight.prototype.onBatteryLow = function(cb){
   cordova.exec(cb, cb, 'CDVCardFlight', 'onBatteryLow', [])
@@ -61,5 +65,11 @@ CardFlight.prototype.watchForSwipe = function(successCb, errorCb){
   cordova.exec(successCb, errorObjFunc(errorCb), 'CDVCardFlight', 'watchForSwipe', [])
 }
 
+CardFlight.prototype.stopSwipe = function(successCb, errorCb){
+  cordova.exec(successCb, errorObjFunc(errorCb), 'CDVCardFlight', 'stopSwipe', [])
+}
+
 cardFlight = new CardFlight()
 module.exports = cardFlight
+});
+

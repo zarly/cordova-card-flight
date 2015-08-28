@@ -1,11 +1,12 @@
 package org.weeels.plugins.cardflight;
 
-import org.apache.cordova.CordovaInterface;
-import org.apache.cordova.CallbackContext;
-import org.apache.cordova.PluginResult;
-import com.getcardflight.models.Card;
-import com.getcardflight.interfaces.*;
 import android.util.Log;
+import com.getcardflight.interfaces.CardFlightDeviceHandler;
+import com.getcardflight.models.Card;
+import com.getcardflight.models.Reader;
+import org.apache.cordova.CallbackContext;
+import org.apache.cordova.CordovaInterface;
+import org.apache.cordova.PluginResult;
 
 public class CardFlightHandler implements CardFlightDeviceHandler {
   
@@ -18,11 +19,18 @@ public class CardFlightHandler implements CardFlightDeviceHandler {
   private CallbackContext readerDisconnectedCallbackContext;
   private CallbackContext readerConnectedCallbackContext;
   private CallbackContext onBeginSwipeCallbackContext;
+  private CallbackContext onReaderFailCallbackContext;
+
+  private Reader reader;
 
   private boolean conntectedAfterConnectingCalled;
 
   public CardFlightHandler(CordovaInterface c) {
     cordova = c;
+  }
+
+  public void setReader(Reader reader) {
+    this.reader = reader;
   }
 
   private void sendSuccessToCallback(CallbackContext callbackContext, String message) {
@@ -67,6 +75,10 @@ public class CardFlightHandler implements CardFlightDeviceHandler {
     onBeginSwipeCallbackContext = callbackContext;
   }
 
+  public void onReaderFail(CallbackContext callbackContext) {
+    this.onReaderFailCallbackContext = callbackContext;
+  }
+
   public void onBatteryLow(CallbackContext callbackContext) {
     logError("onBatteryLow not supported by Android CardFlight SDK");
     callbackContext.error("Cannot use onBatteryLow on Android");
@@ -76,6 +88,7 @@ public class CardFlightHandler implements CardFlightDeviceHandler {
     log("tokenizing card");
     if (card == null) {
       callbackContext.error("No card to tokenize");
+      return;
     }
 
     TokenizationHandler tokenHandler = new TokenizationHandler(card, callbackContext);
@@ -84,16 +97,6 @@ public class CardFlightHandler implements CardFlightDeviceHandler {
 
   public void resetCard() {
     card = null;
-  }
-
-  @Override
-  public void readerCardResponse(Card c) {
-    log("readerCardResponse called");
-    if (cardReadCallbackContext != null) {
-      card = c;
-      sendSuccessToCallback(cardReadCallbackContext, "Card read successfully");
-      // cardReadCallbackContext.success("Card read successfully");
-    }
   }
 
   @Override
@@ -155,10 +158,30 @@ public class CardFlightHandler implements CardFlightDeviceHandler {
   }
 
   @Override
+  public void readerCardResponse(Card c) {
+    log("readerCardResponse called");
+    if (cardReadCallbackContext != null) {
+      card = c;
+      sendSuccessToCallback(cardReadCallbackContext, "Card read successfully");
+      // cardReadCallbackContext.success("Card read successfully");
+    }
+  }
+
+  @Override
   public void readerFail(String errorMessage, int errorCode) {
     logError("readerFail callback: " + errorMessage);
-    if (readerConnectingCallbackContext != null) {
-      sendErrorToCallback(readerConnectingCallbackContext, "Error connecting: "+errorMessage);
+
+    if (errorCode == 485 || errorCode == 483) {
+      // CardFlight doesn't respect changing the
+      // timeout value for swipes, so retry swiping if we timeout or if there's a swipe error
+      if (this.reader != null) {
+        this.reader.beginSwipe();
+      }
+    }
+
+    // Still let the error code go to
+    if (onReaderFailCallbackContext != null) {
+      sendErrorToCallback(onReaderFailCallbackContext, Integer.toString(errorCode));
     }
   }
 
